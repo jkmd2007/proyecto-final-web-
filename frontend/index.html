@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIUL | Iniciar sesión</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+    <main class="box">
+        <h1>Bienvenido a RIUL</h1>
+        <p>Ingresa tus datos para continuar en la plataforma.</p>
+        <div class="login-form">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGaiCyWvhUIDR2wqCsVlpBciClqef2vUKrACbpUeAc2w&s=10" alt="Logo de RIUL" class="logo">
+            <form class="form" action="/login" method="POST">
+                <label>Usuario</label>
+                <input type="text" id="usuario" name="username" required>
+                
+                <label>Contraseña</label>
+                <input type="password" id="password" name="password" required>
+                
+                <button type="submit" id="login-button">Iniciar sesión</button> <br>
+                <a href="/register" class="register-link">¿No tienes cuenta? Regístrate</a><br>
+                <a href="/forgot-password" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
