@@ -1,0 +1,42 @@
+services:
+  #aplicacion Riul
+  app:
+    build: .
+    #nomrbre del contenedor
+    container_name: Riul_app
+    #localhost: 5000-> contenedor:5000
+    ports:
+      -"5000:5000"
+    environment:
+      DATABASE_URL: mysql+pymysql://Riul_user:Riul_password@db:3306/Ruil_db
+
+
+      JWT_SECRET_KEY: super-clave-secret
+
+    depends_on:
+      db:
+        condition:  services_healthy
+      restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    container_name: Riul_app
+    environment:
+        MYSQL_DATABASE: Ruil_db
+        MYSQL_USER: Riul_user
+        MYSQL_PASSWORD:  root_password
+        MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data: /var/lib/mysql
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CDM", "mysqladmin","ping","-h","localhost","-uroot","-proot_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:
