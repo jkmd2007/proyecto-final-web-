@@ -2,9 +2,9 @@
 From python:3.12-slim
 
 #variables de entorno
-ENV pythondontwritebytecode=1
+ENV PYTHONDONTWRITEBYTECODE=1
 #logs
-ENV pythonnunbuffered=1
+ENV PYTHONUNBUFFERED=1
 #directorio de trabajo
 WORKDIR /app
 
@@ -32,4 +32,4 @@ EXPOSE 5000
 
 #Guinicorn exect app en flask
 
-CMD [ "gunicorns","--bind","0.0.0.0:5000","--workers","3","run:app" ]
+CMD [ "gunicorn","--bind","0.0.0.0:5000","--workers","3","run:app" ]

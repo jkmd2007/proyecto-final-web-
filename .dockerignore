@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+#entorno virtual
+.venv/
+venv/
+
+#Variables de entorno
+.env
+
+#Vs code/
+.vscode
+
+#testing
+.pytest_cache/
+
+#mysql_date
+mysql_data
+
+#Git
+.git/
+.gitignore/

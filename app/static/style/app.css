@@ -1,0 +1,35 @@
+body {
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
+}
+
+
+/*
+ * Mejoramos el comportamiento visual
+ * de los campos cuando reciben foco.
+ */
+
+input:focus,
+textarea:focus,
+select:focus {
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(12, 68, 124, 0.25);
+}
+
+
+/*
+ * Eliminamos espacios entre celdas.
+ */
+
+table {
+
+    border-collapse: collapse;
+}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+    RIUL | Red de Investigación
+{% endblock %}
+
+{% block auth %}
+    {% include "partials/_auth.html" %}
+{% endblock %}
+
+{% block content %}
+    <section id="app-shell" class="hidden space-y-6">
+
+        <nav class="flex flex-wrap gap-3">
+            <button data-screen="dashboard" class="rounded-xl bg-[#3a3a38] px-4 py-2 text-sm font-semibold text-white shadow-sm">
+                Inicio
+            </button>
+            <button data-screen="semilleros" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Semilleros
+            </button>
+            <button data-screen="proyectos" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Proyectos
+            </button>
+            <button data-screen="publicaciones" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Publicaciones
+            </button>
+            <button data-screen="eventos" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Eventos
+            </button>
+            <button data-screen="convocatorias" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Convocatorias
+            </button>
+            <button data-screen="logros" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Logros
+            </button>
+            <button data-screen="ranking" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Ranking
+            </button>
+            <button data-screen="profile" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+                Perfil
+            </button>
+        </nav>
+
+        {% include "partials/_dashboard.html" %}
+        {% include "partials/_semillero.html" %}
+        {% include "partials/_modules.html" %}
+        {% include "partials/_profile.html" %}
+
+    </section>
+{% endblock %}

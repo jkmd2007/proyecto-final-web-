@@ -1,0 +1,332 @@
+<section
+    id="auth-section"
+    class="grid min-h-screen md:grid-cols-[40%_60%]"
+>
+
+
+    <!-- =====================================================
+         PANEL INSTITUCIONAL
+    ====================================================== -->
+
+    <aside
+        class="flex flex-col items-center justify-center bg-[#2c2c2a] px-8 py-16 text-center text-[#e7e6e2]"
+    >
+        <img
+            src="{{ url_for('static', filename='style/img/Escudo-Unilibre.png') }}"
+            alt="Logo Universidad Libre"
+            class="h-21 w-32">
+
+        <span
+            class="mt-8 rounded-md bg-[#f1f0ec] px-5 py-2 text-lg font-bold tracking-wide text-[#2c2c2a]"
+        >
+            RIUL
+        </span>
+
+        <p class="mt-6 text-base font-medium">
+            Red de Investigación
+        </p>
+
+        <p class="mt-1 text-base font-medium">
+            Universidad Libre
+        </p>
+
+        
+
+    </aside>
+
+
+    <!-- =====================================================
+         LOGIN / REGISTRO / RECUPERAR
+    ====================================================== -->
+
+    <div class="bg-[#f1f0ec] px-8 py-12 md:px-16">
+
+
+        <div id="login-panel">
+
+            <h2 class="text-2xl font-semibold text-[#232321]">
+                Iniciar sesión
+            </h2>
+
+            <p class="mt-2 text-sm text-[#6b6a66]">
+                ¿Tienes cuenta institucional?
+            </p>
+
+
+            <div class="mt-3 flex flex-wrap gap-2">
+
+                <button
+                    id="toggle-login"
+                    type="button"
+                    class="auth-toggle rounded-full bg-[#3a3a38] px-4 py-1.5 text-xs font-medium text-white"
+                >
+                    Sí
+                </button>
+
+                <button
+                    id="toggle-register"
+                    type="button"
+                    class="auth-toggle rounded-full bg-[#eeeeea] px-4 py-1.5 text-xs font-medium text-[#3a3a38]"
+                >
+                    No, registrarme
+                </button>
+
+            </div>
+
+
+            <div class="mt-6 space-y-4">
+
+                <div>
+                    <label
+                        for="login-email"
+                        class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                    >
+                        Correo institucional
+                    </label>
+                    <input
+                        id="login-email"
+                        type="email"
+                        placeholder="correo@unilibre.edu.co"
+                        class="w-full rounded-md border border-[#c9c8c2] bg-white p-3"
+                    >
+                </div>
+
+
+                <div>
+                    <label
+                        for="login-password"
+                        class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                    >
+                        Contraseña
+                    </label>
+                    <input
+                        id="login-password"
+                        type="password"
+                        placeholder="••••••••"
+                        class="w-full rounded-md border border-[#c9c8c2] bg-white p-3"
+                    >
+                </div>
+
+
+                <button
+                    id="forgot-password-link"
+                    type="button"
+                    class="ml-auto block text-sm text-[#0c447c] hover:underline"
+                >
+                    ¿Olvidaste tu contraseña?
+                </button>
+
+
+                <button
+                    id="login-button"
+                    type="button"
+                    class="w-full rounded-md bg-[#3a3a38] py-3 font-semibold text-white hover:bg-[#2c2c2a]"
+                >
+                    Iniciar sesión
+                </button>
+
+
+                <button
+                    id="guest-button"
+                    type="button"
+                    class="w-full rounded-md border border-[#c9c8c2] bg-[#eeeeea] py-3 font-semibold text-[#3a3a38] hover:bg-white"
+                >
+                    Entrar como visitante
+                </button>
+
+            </div>
+
+
+            <hr class="my-8 border-[#d8d7d1]">
+
+
+            <div id="register-panel">
+
+                <p class="font-medium text-[#232321]">
+                    ¿No tienes cuenta institucional?
+                </p>
+
+                <p class="mt-1 text-sm text-[#6b6a66]">
+                    Completa el formulario de solicitud de registro:
+                </p>
+
+
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
+
+                    <div>
+                        <label
+                            for="register-name"
+                            class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                        >
+                            Nombre completo
+                        </label>
+                        <input
+                            id="register-name"
+                            type="text"
+                            class="w-full rounded-md border border-[#c9c8c2] bg-white p-2.5"
+                        >
+                    </div>
+
+
+                    <div>
+                        <label
+                            for="register-faculty"
+                            class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                        >
+                            Facultad
+                        </label>
+                        <input
+                            id="register-faculty"
+                            type="text"
+                            class="w-full rounded-md border border-[#c9c8c2] bg-white p-2.5"
+                        >
+                    </div>
+
+
+                    <div>
+                        <label
+                            for="register-program"
+                            class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                        >
+                            Programa académico
+                        </label>
+                        <input
+                            id="register-program"
+                            type="text"
+                            class="w-full rounded-md border border-[#c9c8c2] bg-white p-2.5"
+                        >
+                    </div>
+
+
+                    <div>
+                        <label
+                            for="register-email"
+                            class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                        >
+                            Correo de contacto
+                        </label>
+                        <input
+                            id="register-email"
+                            type="email"
+                            class="w-full rounded-md border border-[#c9c8c2] bg-white p-2.5"
+                        >
+                    </div>
+
+
+                    <div class="md:col-span-2">
+                        <label
+                            for="register-password"
+                            class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                        >
+                            Contraseña
+                        </label>
+                        <input
+                            id="register-password"
+                            type="password"
+                            class="w-full rounded-md border border-[#c9c8c2] bg-white p-2.5"
+                        >
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="register-button"
+                    type="button"
+                    class="mt-6 w-full rounded-md border border-[#c9c8c2] bg-[#eeeeea] py-3 font-semibold text-[#3a3a38] hover:bg-white"
+                >
+                    Enviar solicitud de registro
+                </button>
+
+
+                <p class="mx-auto mt-3 w-fit rounded-full bg-[#faeeda] px-4 py-1 text-center text-xs font-medium text-[#854f0b]">
+                    Pendiente de aprobación del admin
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div id="recover-panel" class="hidden max-w-xl">
+
+            <h2 class="text-2xl font-semibold text-[#232321]">
+                Recuperar contraseña
+            </h2>
+
+            <p class="mt-2 text-sm text-[#6b6a66]">
+                Ingresa tu correo institucional para restablecer el acceso.
+            </p>
+
+
+            <div class="mt-6 space-y-4">
+
+                <div>
+                    <label
+                        for="recover-email"
+                        class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                    >
+                        Correo institucional
+                    </label>
+                    <input
+                        id="recover-email"
+                        type="email"
+                        class="w-full rounded-md border border-[#c9c8c2] bg-white p-3"
+                    >
+                </div>
+
+
+                <div>
+                    <label
+                        for="recover-password"
+                        class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                    >
+                        Contraseña nueva
+                    </label>
+                    <input
+                        id="recover-password"
+                        type="password"
+                        class="w-full rounded-md border border-[#c9c8c2] bg-white p-3"
+                    >
+                </div>
+
+
+                <div>
+                    <label
+                        for="recover-password-confirm"
+                        class="mb-2 block text-sm font-medium text-[#6b6a66]"
+                    >
+                        Confirmar contraseña
+                    </label>
+                    <input
+                        id="recover-password-confirm"
+                        type="password"
+                        class="w-full rounded-md border border-[#c9c8c2] bg-white p-3"
+                    >
+                </div>
+
+
+                <button
+                    id="recover-button"
+                    type="button"
+                    class="w-full rounded-md bg-[#3a3a38] py-3 font-semibold text-white hover:bg-[#2c2c2a]"
+                >
+                    Actualizar contraseña
+                </button>
+
+
+                <button
+                    id="back-to-login"
+                    type="button"
+                    class="w-full text-sm font-medium text-[#0c447c] hover:underline"
+                >
+                    Volver al inicio de sesión
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
