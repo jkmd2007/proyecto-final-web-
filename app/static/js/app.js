@@ -152,7 +152,16 @@ function showApplication() {
         .classList.remove("hidden");
 
     fillProfile();
-    showScreen("dashboard");
+
+    if (typeof applyRole === "function") {
+        applyRole();
+    }
+
+    showScreen(
+        typeof defaultScreen === "function"
+            ? defaultScreen()
+            : "dashboard"
+    );
 }
 
 
@@ -332,7 +341,11 @@ async function login() {
             "user",
             JSON.stringify({
                 name: email.split("@")[0],
-                email: email
+                email: email,
+                // TEMPORAL: sin API, el rol se simula según el correo (ver roles.js)
+                role: typeof inferDemoRole === "function"
+                    ? inferDemoRole(email)
+                    : undefined
             })
         );
 
