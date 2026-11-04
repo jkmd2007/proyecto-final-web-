@@ -1,0 +1,78 @@
+body {
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
+}
+
+
+/*
+ * Mejoramos el comportamiento visual
+ * de los campos cuando reciben foco.
+ */
+
+input:focus,
+textarea:focus,
+select:focus {
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(12, 68, 124, 0.25);
+}
+
+
+/*
+ * Accesibilidad (RNF-13): foco visible con buen contraste
+ * para quienes navegan con teclado.
+ */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+
+    outline: 3px solid #0c447c;
+    outline-offset: 2px;
+}
+
+.skip-link {
+
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    background: #232321;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.skip-link:focus {
+
+    top: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+
+/*
+ * Eliminamos espacios entre celdas.
+ */
+
+table {
+
+    border-collapse: collapse;
+}

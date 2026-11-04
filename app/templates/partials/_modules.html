@@ -1,108 +1,103 @@
+<!-- =====================================================
+     PANTALLAS PÚBLICAS / ESTUDIANTE (datos desde el API)
+     El contenido de cada contenedor lo genera static/js/student.js
+====================================================== -->
+
+<!-- Proyectos -->
 <section id="proyectos-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 class="text-2xl font-bold">Proyectos</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Listado de proyectos de investigación vinculados a RIUL.</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold">Proyectos</h2>
+                <p class="mt-2 text-sm text-[#6b6a66]">Proyectos de investigación de los semilleros activos.</p>
+            </div>
+            <input id="proyectos-search" type="search" placeholder="Buscar proyectos..." aria-label="Buscar proyectos"
+                class="w-full rounded-lg border border-[#c9c8c2] px-4 py-2 text-sm lg:w-64">
+        </div>
     </div>
-    <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
-        <table class="w-full text-left">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th class="px-4 py-4">Proyecto</th>
-                    <th class="px-4 py-4">Semillero</th>
-                    <th class="px-4 py-4">Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-4 font-semibold">Observatorio de datos académicos</td>
-                    <td class="px-4 py-4">DataLab</td>
-                    <td class="px-4 py-4">En curso</td>
-                </tr>
-                <tr>
-                    <td class="px-4 py-4 font-semibold">Clasificador de publicaciones</td>
-                    <td class="px-4 py-4">DataLab</td>
-                    <td class="px-4 py-4">Nuevo</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <div id="proyectos-list"></div>
 </section>
 
 
+<!-- Publicaciones -->
 <section id="publicaciones-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 class="text-2xl font-bold">Publicaciones</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Productos académicos visibles para la comunidad.</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold">Publicaciones</h2>
+                <p class="mt-2 text-sm text-[#6b6a66]">Artículos, ponencias y productos de investigación. Reacciona, comenta y comparte.</p>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <input id="publicaciones-search" type="search" placeholder="Buscar publicaciones..." aria-label="Buscar publicaciones"
+                    class="w-full rounded-lg border border-[#c9c8c2] px-4 py-2 text-sm sm:w-64">
+                <button id="publicaciones-create" type="button" class="hidden rounded-md bg-[#3a3a38] px-5 py-2 text-sm font-medium text-white">
+                    Nueva publicación
+                </button>
+            </div>
+        </div>
     </div>
-    <article class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="font-semibold">Modelo predictivo de deserción estudiantil</p>
-        <p class="mt-2 text-sm text-[#6b6a66]">Artículo · Semillero DataLab · 2025</p>
-    </article>
+    <div id="publicaciones-list" class="grid gap-4 lg:grid-cols-2"></div>
 </section>
 
 
+<!-- Eventos -->
 <section id="eventos-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
         <h2 class="text-2xl font-bold">Eventos</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Encuentros, ferias y ponencias del ecosistema investigativo.</p>
+        <p class="mt-2 text-sm text-[#6b6a66]">Eventos académicos y científicos. Registra tu participación.</p>
     </div>
-    <article class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="font-semibold">Encuentro nacional de semilleros</p>
-        <p class="mt-2 text-sm text-[#6b6a66]">Octubre 2026 · Modalidad híbrida</p>
-    </article>
+    <div id="eventos-list" class="grid gap-4 lg:grid-cols-2"></div>
 </section>
 
 
+<!-- Convocatorias -->
 <section id="convocatorias-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
         <h2 class="text-2xl font-bold">Convocatorias</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Oportunidades abiertas para vincularse a proyectos y semilleros.</p>
+        <p class="mt-2 text-sm text-[#6b6a66]">Convocatorias institucionales de investigación.</p>
     </div>
-    <article class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="font-semibold">Convocatoria interna de investigación</p>
-        <p class="mt-2 text-sm text-[#6b6a66]">Cierre: 30 de noviembre · Estado: Abierta</p>
-    </article>
+    <div id="convocatorias-list" class="grid gap-4 lg:grid-cols-2"></div>
 </section>
 
 
+<!-- Logros -->
 <section id="logros-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 class="text-2xl font-bold">Logros</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Reconocimientos institucionales y académicos.</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold">Logros</h2>
+                <p class="mt-2 text-sm text-[#6b6a66]">Registra tus logros con evidencia. Tu docente líder o un administrador los valida y se asigna XP.</p>
+            </div>
+            <button id="logros-create" type="button" class="hidden rounded-md bg-[#3a3a38] px-5 py-2 text-sm font-medium text-white">
+                Registrar logro
+            </button>
+        </div>
     </div>
-    <article class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="font-semibold">Primer lugar · Feria de semilleros Unilibre</p>
-        <p class="mt-2 text-sm text-[#6b6a66]">Semillero DataLab · 2025</p>
-    </article>
+    <div id="logros-list"></div>
 </section>
 
 
+<!-- Ranking -->
 <section id="ranking-screen" class="app-screen hidden space-y-4">
     <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 class="text-2xl font-bold">Ranking</h2>
-        <p class="mt-2 text-sm text-[#6b6a66]">Clasificación de semilleros según actividad investigativa.</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold">Ranking</h2>
+                <p class="mt-2 text-sm text-[#6b6a66]">Posiciones por XP acumulado, general o por facultad.</p>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <select id="ranking-tipo" aria-label="Tipo de ranking" class="rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text-sm">
+                    <option value="semilleros">Semilleros</option>
+                    <option value="estudiantes">Estudiantes investigadores</option>
+                </select>
+                <select id="ranking-facultad" aria-label="Facultad" class="rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text-sm">
+                    <option value="">Todas las facultades</option>
+                </select>
+            </div>
+        </div>
     </div>
-    <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
-        <table class="w-full text-left">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th class="px-4 py-4">Puesto</th>
-                    <th class="px-4 py-4">Semillero</th>
-                    <th class="px-4 py-4">Nivel</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-4">1</td>
-                    <td class="px-4 py-4 font-semibold">DataLab</td>
-                    <td class="px-4 py-4">4 ★</td>
-                </tr>
-                <tr>
-                    <td class="px-4 py-4">2</td>
-                    <td class="px-4 py-4 font-semibold">BioLibre</td>
-                    <td class="px-4 py-4">3 ★</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <div id="ranking-list"></div>
 </section>
+
+
+<!-- Notificaciones (la pantalla la genera roles.js para usuarios con sesión) -->

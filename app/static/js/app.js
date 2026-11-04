@@ -268,31 +268,43 @@ function showScreen(screenName) {
 
 async function register() {
 
+    const value = function (id) {
+        return document.getElementById(id).value.trim();
+    };
+
+    const payload = {
+        name: value("register-name"),
+        faculty: value("register-faculty"),
+        program: value("register-program"),
+        institutional: value("register-institutional") === "1",
+        email: value("register-email"),
+        password: document.getElementById("register-password").value
+    };
+
+    if (!payload.name || !payload.email || !payload.password) {
+        showMessage("Completa nombre, correo y contraseña", "error");
+        return;
+    }
+
     try {
 
-        const payload = {
-            name: document.getElementById("register-name").value,
-            faculty: document.getElementById("register-faculty").value,
-            program: document.getElementById("register-program").value,
-            email: document.getElementById("register-email").value,
-            password: document.getElementById("register-password").value
-        };
-
-        const response = await api.post(
-            "/auth/register",
-            payload
-        );
+        const response = await api.post("/auth/register", payload);
 
         showMessage(
-            response.data.message || "Solicitud enviada. Pendiente de aprobación del admin."
+            response.data.message ||
+            "Solicitud enviada. Pendiente de aprobación del admin."
         );
+
+        ["register-name", "register-email", "register-password"].forEach(function (id) {
+            document.getElementById(id).value = "";
+        });
 
     } catch (error) {
 
         showMessage(
             error.response?.data?.message ||
-            "Solicitud registrada en la interfaz. El API de registro se conectará después.",
-            error.response ? "error" : "success"
+            "No se pudo conectar con el servidor",
+            "error"
         );
     }
 }
@@ -306,8 +318,13 @@ async function register() {
 
 async function login() {
 
-    const email = document.getElementById("login-email").value;
+    const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
+
+    if (!email || !password) {
+        showMessage("Ingresa correo y contraseña", "error");
+        return;
+    }
 
     try {
 
@@ -318,38 +335,18 @@ async function login() {
 
         const data = response.data.data;
 
-        localStorage.setItem(
-            "access_token",
-            data.access_token
-        );
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(data.user)
-        );
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         showApplication();
 
     } catch (error) {
 
-        if (!email || !password) {
-            showMessage("Ingresa correo y contraseña", "error");
-            return;
-        }
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify({
-                name: email.split("@")[0],
-                email: email,
-                // TEMPORAL: sin API, el rol se simula según el correo (ver roles.js)
-                role: typeof inferDemoRole === "function"
-                    ? inferDemoRole(email)
-                    : undefined
-            })
+        showMessage(
+            error.response?.data?.message ||
+            "No se pudo conectar con el servidor",
+            "error"
         );
-
-        showApplication();
     }
 }
 
@@ -376,8 +373,45 @@ function logout() {
 }
 
 
-function recoverPassword() {
+async function sendRecoveryCode() {
 
+    const email = document.getElementById("recover-email").value.trim();
+
+    if (!email) {
+        showMessage("Ingresa tu correo", "error");
+        return;
+    }
+
+    try {
+
+        const response = await api.post("/auth/recover", { email });
+        const code = response.data.data && response.data.data.code;
+
+        if (code) {
+            // Solo en desarrollo (RESET_CODE_IN_RESPONSE=1): no hay servidor de correo
+            document.getElementById("recover-code").value = code;
+        }
+
+        showMessage(
+            code
+                ? `Modo desarrollo: tu código es ${code}`
+                : response.data.message
+        );
+
+    } catch (error) {
+
+        showMessage(
+            error.response?.data?.message || "No se pudo conectar con el servidor",
+            "error"
+        );
+    }
+}
+
+
+async function recoverPassword() {
+
+    const email = document.getElementById("recover-email").value.trim();
+    const code = document.getElementById("recover-code").value.trim();
     const password = document.getElementById("recover-password").value;
     const confirm = document.getElementById("recover-password-confirm").value;
 
@@ -386,8 +420,71 @@ function recoverPassword() {
         return;
     }
 
-    showMessage("Contraseña actualizada. Ya puedes iniciar sesión.");
-    showRecover(false);
+    try {
+
+        const response = await api.post(
+            "/auth/reset",
+            { email, code, password }
+        );
+
+        showMessage(response.data.message);
+        showRecover(false);
+
+    } catch (error) {
+
+        showMessage(
+            error.response?.data?.message || "No se pudo conectar con el servidor",
+            "error"
+        );
+    }
+}
+
+
+/*
+ * ============================================================
+ * SESIÓN INICIAL
+ * ============================================================
+ *
+ * - Con token: se valida contra /auth/me (rol y datos vigentes).
+ * - Sin token: solo se permite el modo visitante.
+ */
+
+async function startSession(token, storedUser) {
+
+    let user = {};
+
+    try {
+        user = JSON.parse(storedUser || "{}");
+    } catch (error) {
+        user = {};
+    }
+
+    if (token) {
+
+        try {
+
+            const response = await api.get("/auth/me");
+
+            localStorage.setItem("user", JSON.stringify(response.data.data));
+            showApplication();
+
+        } catch (error) {
+
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("user");
+            showLogin();
+        }
+
+        return;
+    }
+
+    if (storedUser && !user.role) {
+        showApplication();
+        return;
+    }
+
+    localStorage.removeItem("user");
+    showLogin();
 }
 
 
@@ -437,6 +534,10 @@ document.addEventListener(
             .addEventListener("click", recoverPassword);
 
         document
+            .getElementById("recover-send-button")
+            .addEventListener("click", sendRecoveryCode);
+
+        document
             .getElementById("toggle-login")
             .addEventListener("click", function () {
                 setAuthToggle("login");
@@ -446,18 +547,6 @@ document.addEventListener(
             .getElementById("toggle-register")
             .addEventListener("click", function () {
                 setAuthToggle("register");
-            });
-
-        document
-            .getElementById("join-semillero")
-            .addEventListener("click", function () {
-                showMessage("Solicitud de vinculación enviada");
-            });
-
-        document
-            .getElementById("edit-profile")
-            .addEventListener("click", function () {
-                showMessage("La edición de perfil se conectará con el API");
             });
 
         document
@@ -482,10 +571,6 @@ document.addEventListener(
                 });
             });
 
-        if (token || storedUser) {
-            showApplication();
-        } else {
-            showLogin();
-        }
+        startSession(token, storedUser);
     }
 );

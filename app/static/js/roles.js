@@ -5,13 +5,10 @@
  *
  * - El rol sale de localStorage.user (role | rol | role_name).
  * - Estudiantes y visitantes siguen usando la interfaz original.
- * - Cada módulo declara su `endpoint`. Al cargar intenta
- *   GET {endpoint}; si el API aún no existe usa TEMP_DATA.
- * - Las acciones (crear/editar/aprobar...) llaman al API con
- *   persist(); si responde 404/405/501 o no hay red, el cambio
- *   queda solo en pantalla.
+ * - Cada módulo declara su `endpoint`: GET lo carga y las acciones
+ *   (crear/editar/aprobar...) llaman al API con persist().
  *
- * Contrato esperado del API (pendiente de implementar):
+ * Contrato del API (implementado en app/routes/admin.py y docente.py):
  *   GET    {endpoint}              -> { data: [ ... ] }
  *   POST   {endpoint}              -> { data: { ...creado } }
  *   PUT    {endpoint}/:id
@@ -58,17 +55,6 @@ function getUserRole() {
     const user = getStoredUser();
 
     return normalizeRole(user.role || user.rol || user.role_name || user.roleName);
-}
-
-/* TEMPORAL: sin API de login, "admin@..." y "docente@..." simulan el rol. */
-function inferDemoRole(email) {
-
-    const prefix = String(email || "").toLowerCase();
-
-    if (prefix.startsWith("admin")) return "Administrador";
-    if (prefix.startsWith("docente")) return "Docente Líder";
-
-    return undefined;
 }
 
 function defaultScreen() {
@@ -151,86 +137,12 @@ const INPUT = "w-full rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text
 
 
 /* ============================================================
- * DATOS TEMPORALES (reemplazar por el API)
+ * CATÁLOGOS (se llenan desde GET /api/catalogos, ver student.js)
  * ============================================================ */
 
 const ROLES = ["Administrador", "Docente Líder", "Estudiante Investigador", "Visitante"];
-const FACULTADES = ["Ingeniería", "Derecho", "Ciencias de la Salud", "Ciencias Económicas", "Ciencias Sociales"];
-const PROGRAMAS = ["Ingeniería de Sistemas", "Ingeniería Industrial", "Derecho", "Medicina", "Contaduría Pública", "Psicología"];
-
-const TEMP_CONVOCATORIAS = [
-    { id: 1, titulo: "Convocatoria interna de investigación", cierre: "2026-11-30", estado: "Abierta", postulaciones: 6 },
-    { id: 2, titulo: "Movilidad académica 2027", cierre: "2026-12-15", estado: "Abierta", postulaciones: 2 },
-    { id: 3, titulo: "Financiación de semilleros 2026-I", cierre: "2026-03-15", estado: "Cerrada", postulaciones: 11 }
-];
-
-const TEMP_DATA = {
-
-    usuarios: [
-        { id: 1, nombre: "Marcela Ortiz", correo: "marcela.ortiz@unilibre.edu.co", facultad: "Ingeniería", programa: "Ingeniería de Sistemas", rol: "Docente Líder", estado: "Activo", cuenta: "Institucional", fecha: "2026-08-02" },
-        { id: 2, nombre: "Elena Ruiz", correo: "elena.ruiz@unilibre.edu.co", facultad: "Ingeniería", programa: "Ingeniería de Sistemas", rol: "Estudiante Investigador", estado: "Activo", cuenta: "Institucional", fecha: "2026-08-10" },
-        { id: 3, nombre: "Carlos Pérez", correo: "carlos.perez@unilibre.edu.co", facultad: "Ingeniería", programa: "Ingeniería Industrial", rol: "Estudiante Investigador", estado: "Activo", cuenta: "Institucional", fecha: "2026-08-12" },
-        { id: 4, nombre: "Andrés Barrios", correo: "abarrios@unilibre.edu.co", facultad: "Derecho", programa: "Derecho", rol: "Docente Líder", estado: "Activo", cuenta: "Institucional", fecha: "2026-07-21" },
-        { id: 5, nombre: "Luis Mora", correo: "luis.mora@gmail.com", facultad: "Ciencias Económicas", programa: "Contaduría Pública", rol: "Visitante", estado: "Inactivo", cuenta: "Externa", fecha: "2026-06-30" },
-        { id: 6, nombre: "Sofía Vega", correo: "sofia.vega@unilibre.edu.co", facultad: "Ciencias de la Salud", programa: "Medicina", rol: "Estudiante Investigador", estado: "Pendiente", cuenta: "Institucional", fecha: "2026-10-12" },
-        { id: 7, nombre: "Mateo Rojas", correo: "mateo.rojas@outlook.com", facultad: "Ciencias Sociales", programa: "Psicología", rol: "Estudiante Investigador", estado: "Pendiente", cuenta: "Externa", fecha: "2026-10-14" },
-        { id: 8, nombre: "Valentina Cruz", correo: "vcruz@correo.com", facultad: "Derecho", programa: "Derecho", rol: "Visitante", estado: "Pendiente", cuenta: "Externa", fecha: "2026-10-15" }
-    ],
-
-    semilleros: [
-        { id: 1, nombre: "DataLab", facultad: "Ingeniería", linea: "Ciencia de datos", lider: "Marcela Ortiz", integrantes: 18, nivel: 4, estado: "Activo", descripcion: "Análisis de datos y visualización aplicados a la investigación universitaria." },
-        { id: 2, nombre: "BioLibre", facultad: "Ciencias de la Salud", linea: "Biodiversidad", lider: "Camilo Herrera", integrantes: 12, nivel: 3, estado: "Activo", descripcion: "Estudio de biodiversidad y salud pública en el Caribe." },
-        { id: 3, nombre: "JurisLab", facultad: "Derecho", linea: "Justicia digital", lider: "Andrés Barrios", integrantes: 9, nivel: 2, estado: "Inactivo", descripcion: "Acceso a la justicia y derecho informático." },
-        { id: 4, nombre: "EcoFinanzas", facultad: "Ciencias Económicas", linea: "Economía regional", lider: "Paola Mejía", integrantes: 10, nivel: 3, estado: "Activo", descripcion: "Finanzas sostenibles y desarrollo regional." }
-    ],
-
-    proyectos: [
-        { id: 1, nombre: "Observatorio de datos académicos", semillero: "DataLab", estado: "En curso", avance: 65, inicio: "2026-02-10", descripcion: "Tablero de indicadores académicos." },
-        { id: 2, nombre: "Clasificador de publicaciones RIUL", semillero: "DataLab", estado: "Nuevo", avance: 10, inicio: "2026-09-01", descripcion: "Clasificación automática por línea de investigación." },
-        { id: 3, nombre: "Biodiversidad del Caribe", semillero: "BioLibre", estado: "En curso", avance: 40, inicio: "2026-03-05", descripcion: "Inventario de especies locales." },
-        { id: 4, nombre: "Acceso a la justicia digital", semillero: "JurisLab", estado: "Finalizado", avance: 100, inicio: "2025-08-18", descripcion: "Diagnóstico de acceso a servicios judiciales en línea." }
-    ],
-
-    eventos: [
-        { id: 1, nombre: "Encuentro nacional de semilleros", fecha: "2026-10-28", modalidad: "Híbrida", semillero: "DataLab", estado: "Abierta" },
-        { id: 2, nombre: "Feria de investigación Unilibre", fecha: "2026-11-12", modalidad: "Presencial", semillero: "BioLibre", estado: "Abierta" },
-        { id: 3, nombre: "Webinar de ciencia abierta", fecha: "2026-10-22", modalidad: "Virtual", semillero: "EcoFinanzas", estado: "Cerrada" }
-    ],
-
-    publicaciones: [
-        { id: 1, titulo: "Modelo predictivo de deserción estudiantil", tipo: "Artículo", semillero: "DataLab", autor: "Elena Ruiz", anio: 2026, reacciones: 8, comentarios: 3, estado: "Publicada" },
-        { id: 2, titulo: "Dashboard de indicadores de investigación", tipo: "Producto", semillero: "DataLab", autor: "Carlos Pérez", anio: 2026, reacciones: 5, comentarios: 1, estado: "Publicada" },
-        { id: 3, titulo: "Análisis de redes en semilleros Unilibre", tipo: "Ponencia", semillero: "DataLab", autor: "Marcela Ortiz", anio: 2025, reacciones: 8, comentarios: 2, estado: "Publicada" },
-        { id: 4, titulo: "Minería de texto en convocatorias internas", tipo: "Artículo", semillero: "DataLab", autor: "Ana Gómez", anio: 2025, reacciones: 2, comentarios: 0, estado: "En revisión" }
-    ],
-
-    logros: [
-        { id: 1, descripcion: "Ponencia nacional en ciencia de datos", usuario: "Elena Ruiz", tipo: "Ponencia", xp: 150, estado: "Pendiente" },
-        { id: 2, descripcion: "Primer artículo indexado", usuario: "Carlos Pérez", tipo: "Artículo", xp: 300, estado: "Aprobado" },
-        { id: 3, descripcion: "Participación en feria de semilleros", usuario: "Ana Gómez", tipo: "Evento", xp: 80, estado: "Pendiente" },
-        { id: 4, descripcion: "Patente en trámite", usuario: "Luis Mora", tipo: "Patente", xp: 500, estado: "Rechazado" }
-    ],
-
-    docSemillero: {
-        nombre: "DataLab",
-        descripcion: "Análisis de datos, visualización y proyectos aplicados a la investigación universitaria.",
-        linea: "Ciencia de datos",
-        facultad: "Ingeniería",
-        nivel: 4,
-        xp: 2340,
-        xpSiguiente: 3000,
-        estado: "Activo"
-    },
-
-    docIntegrantes: [
-        { id: 1, nombre: "Elena Ruiz", correo: "elena.ruiz@unilibre.edu.co", programa: "Ingeniería de Sistemas", estado: "Activo", desde: "2026-02-01" },
-        { id: 2, nombre: "Carlos Pérez", correo: "carlos.perez@unilibre.edu.co", programa: "Ingeniería Industrial", estado: "Activo", desde: "2026-02-01" },
-        { id: 3, nombre: "Ana Gómez", correo: "ana.gomez@unilibre.edu.co", programa: "Ingeniería de Sistemas", estado: "Activo", desde: "2026-03-10" },
-        { id: 4, nombre: "Luis Mora", correo: "luis.mora@unilibre.edu.co", programa: "Ingeniería de Sistemas", estado: "Activo", desde: "2026-04-22" },
-        { id: 5, nombre: "Sofía Vega", correo: "sofia.vega@unilibre.edu.co", programa: "Ingeniería de Sistemas", estado: "Pendiente", desde: "2026-10-12" },
-        { id: 6, nombre: "Mateo Rojas", correo: "mateo.rojas@unilibre.edu.co", programa: "Ingeniería Industrial", estado: "Pendiente", desde: "2026-10-14" }
-    ]
-};
+const FACULTADES = [];
+const PROGRAMAS = [];
 
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -242,13 +154,13 @@ function clone(value) {
  * ============================================================ */
 
 const RS = {};          // filas por módulo
-const usingMock = {};   // módulo -> true si usa TEMP_DATA
 
-/*
- * Ejecuta la acción contra el API.
- * Si el endpoint aún no existe (404/405/501 o sin respuesta)
- * devuelve { ok: true, local: true } para que la UI siga funcionando.
- */
+function errorText(error) {
+    return (error.response && error.response.data && error.response.data.message) ||
+        "No se pudo conectar con el servidor";
+}
+
+/* Ejecuta la acción contra el API. Devuelve { ok, data }. */
 async function persist(method, url, data) {
 
     try {
@@ -257,30 +169,20 @@ async function persist(method, url, data) {
 
         return {
             ok: true,
-            local: false,
-            data: response.data && response.data.data
+            data: response.data && response.data.data,
+            message: response.data && response.data.message
         };
 
     } catch (error) {
 
-        const status = error.response && error.response.status;
-
-        if (!error.response || [404, 405, 501].includes(status)) {
-            return { ok: true, local: true };
-        }
-
-        showMessage(
-            (error.response.data && error.response.data.message) ||
-            "No se pudo completar la acción",
-            "error"
-        );
+        showMessage(errorText(error), "error");
 
         return { ok: false };
     }
 }
 
 function doneMessage(text, result) {
-    showMessage(result.local ? `${text} · solo en pantalla, API pendiente` : text);
+    showMessage((result && result.message) || text);
 }
 
 async function mutate(cfg, row, patch, options) {
@@ -294,9 +196,11 @@ async function mutate(cfg, row, patch, options) {
 
     if (!result.ok) return false;
 
-    Object.assign(row, patch);
+    Object.assign(row, patch, result.data && typeof result.data === "object" ? result.data : {});
     renderModule(cfg);
     doneMessage(opts.message || "Cambios guardados", result);
+
+    if (cfg.afterChange) cfg.afterChange();
 
     return true;
 }
@@ -329,11 +233,14 @@ function openForm(options) {
         if (field.type === "textarea") {
             control = `<textarea name="${field.key}" rows="3" ${required} class="${INPUT}">${esc(value)}</textarea>`;
         } else if (field.type === "select") {
+            const options = typeof field.options === "function" ? field.options() : field.options;
             control = `<select name="${field.key}" ${required} class="${INPUT}">` +
-                field.options.map(function (option) {
-                    return `<option value="${esc(option)}" ${option === value ? "selected" : ""}>${esc(option)}</option>`;
+                options.map(function (option) {
+                    return `<option value="${esc(option)}" ${option === value ? "selected" : ""}>${esc(option) || "—"}</option>`;
                 }).join("") +
                 "</select>";
+        } else if (field.type === "file") {
+            control = `<input name="${field.key}" type="file" accept=".pdf,.png,.jpg,.jpeg,.docx,.pptx,.xlsx" class="${INPUT}">`;
         } else {
             control = `<input name="${field.key}" type="${field.type || "text"}" value="${esc(value)}" ${required} class="${INPUT}">`;
         }
@@ -379,6 +286,29 @@ function bindModal() {
         if (!modalSubmit) return;
 
         const data = Object.fromEntries(new FormData(this).entries());
+
+        /* Archivos de evidencia: se suben primero y se envía su URL (RNF-05) */
+        for (const key of Object.keys(data)) {
+
+            if (!(data[key] instanceof File)) continue;
+
+            if (data[key].size === 0) {
+                delete data[key];
+                continue;
+            }
+
+            const upload = new FormData();
+            upload.append("file", data[key]);
+
+            try {
+                const response = await api.post("/uploads", upload);
+                data[key] = response.data.data.url;
+            } catch (error) {
+                showMessage(errorText(error), "error");
+                return;
+            }
+        }
+
         const keepOpen = (await modalSubmit(data)) === false;
 
         if (!keepOpen) closeForm();
@@ -415,6 +345,8 @@ const act = {
                 RS[cfg.id] = RS[cfg.id].filter(function (item) { return item !== row; });
                 renderModule(cfg);
                 doneMessage(`${cfg.singular} eliminado`, result);
+
+                if (cfg.afterChange) cfg.afterChange();
             }
         };
     },
@@ -454,16 +386,23 @@ function openModuleForm(cfg, row) {
 
             if (!result.ok) return false;
 
-            const created = Object.assign(
-                { id: Date.now() },
-                cfg.defaults || {},
-                data,
-                result.data || {}
-            );
+            const created = Object.assign({}, cfg.defaults || {}, data, result.data || {});
 
             RS[cfg.id].unshift(created);
+
+            if (created.password_temporal) {
+                window.alert(
+                    `Usuario creado.\n\nContraseña temporal: ${created.password_temporal}\n\n` +
+                    "Compártela de forma segura; el usuario puede cambiarla desde su perfil."
+                );
+                delete created.password_temporal;
+            } else {
+                doneMessage(`${cfg.singular} creado`, result);
+            }
+
             renderModule(cfg);
-            doneMessage(`${cfg.singular} creado`, result);
+
+            if (cfg.afterChange) cfg.afterChange();
         }
     });
 }
@@ -497,9 +436,6 @@ function moduleScreenHtml(cfg) {
                     ${create}
                 </div>
             </div>
-            <p id="${cfg.id}-mock" class="mt-3 hidden text-xs text-[#854f0b]">
-                Datos temporales de demostración: se reemplazarán al conectar <code>${esc(cfg.endpoint)}</code>.
-            </p>
         </div>
         <div id="${cfg.id}-table"></div>
     </section>`;
@@ -526,8 +462,6 @@ function renderModule(cfg) {
     });
 
     cfg._view = rows;
-
-    byId(`${cfg.id}-mock`).classList.toggle("hidden", !usingMock[cfg.id]);
 
     if (rows.length === 0) {
         box.innerHTML = `<div class="rounded-2xl bg-white p-6 text-sm text-[#6b6a66] shadow-sm">${esc(cfg.empty || "No hay registros para mostrar.")}</div>`;
@@ -619,23 +553,20 @@ function bindModule(cfg) {
 
 async function loadModule(cfg) {
 
-    RS[cfg.id] = clone(cfg.mock());
-    usingMock[cfg.id] = true;
+    RS[cfg.id] = [];
     renderModule(cfg);
 
     try {
 
         const response = await api.get(cfg.endpoint);
-        const data = response.data && (response.data.data || response.data);
+        const data = response.data && response.data.data;
 
-        if (Array.isArray(data)) {
-            RS[cfg.id] = data;
-            usingMock[cfg.id] = false;
-            renderModule(cfg);
-        }
+        RS[cfg.id] = Array.isArray(data) ? data : [];
+        renderModule(cfg);
 
     } catch (error) {
-        /* API aún no disponible: se conservan los datos temporales. */
+
+        if (!cfg.quietLoad) showMessage(`${cfg.title}: ${errorText(error)}`, "error");
     }
 }
 
@@ -658,12 +589,15 @@ const isSelf = function (row) {
     return String(row.correo).toLowerCase() === String(getStoredUser().email || "").toLowerCase();
 };
 
+function semilleroNames() {
+    return (RS["adm-semilleros"] || []).map(function (s) { return s.nombre; });
+}
+
 const admUsuarios = {
     id: "adm-usuarios", singular: "usuario", titleKey: "nombre",
     title: "Usuarios", subtitle: "Consulta, edita, activa o desactiva cuentas y asigna roles.",
     endpoint: "/admin/users", create: "Nuevo usuario",
     filterKey: "estado", filterOptions: ["Activo", "Inactivo", "Pendiente", "Rechazado"],
-    mock: function () { return TEMP_DATA.usuarios; },
     defaults: { estado: "Activo", cuenta: "Institucional", rol: "Estudiante Investigador", fecha: new Date().toISOString().slice(0, 10) },
     columns: [
         { key: "nombre", label: "Nombre", strong: true },
@@ -700,7 +634,6 @@ const admSolicitudes = {
     title: "Solicitudes de registro", subtitle: "Revisa las cuentas nuevas, ajusta el rol y apruébalas o recházalas.",
     endpoint: "/admin/users", empty: "No hay solicitudes pendientes.",
     base: function (row) { return row.estado === "Pendiente"; },
-    mock: function () { return TEMP_DATA.usuarios; },
     columns: [
         { key: "nombre", label: "Nombre", strong: true },
         { key: "correo", label: "Correo" },
@@ -740,13 +673,12 @@ const admSemilleros = {
     title: "Semilleros", subtitle: "Crea, edita y activa o desactiva semilleros de investigación.",
     endpoint: "/admin/semilleros", create: "Nuevo semillero",
     filterKey: "estado", filterOptions: ["Activo", "Inactivo"],
-    mock: function () { return TEMP_DATA.semilleros; },
     defaults: { estado: "Activo", integrantes: 0, nivel: 1 },
     columns: [
         { key: "nombre", label: "Semillero", strong: true },
         { key: "facultad", label: "Facultad" },
         { key: "linea", label: "Línea" },
-        { key: "lider", label: "Docente líder" },
+        { key: "lider", label: "Docente líder (nombre o correo)" },
         { key: "integrantes", label: "Integrantes" },
         { key: "nivel", label: "Nivel", render: function (row) { return `<span class="text-[#c9a227]" aria-label="${row.nivel} de 5">${stars(row.nivel)}</span>`; } },
         { key: "estado", label: "Estado", badge: true }
@@ -771,7 +703,6 @@ const admProyectos = {
     title: "Proyectos", subtitle: "Supervisa los proyectos de todos los semilleros.",
     endpoint: "/admin/proyectos", create: "Nuevo proyecto",
     filterKey: "estado", filterOptions: ["Nuevo", "En curso", "Finalizado", "Suspendido"],
-    mock: function () { return TEMP_DATA.proyectos; },
     defaults: { estado: "Nuevo", avance: 0, inicio: new Date().toISOString().slice(0, 10) },
     columns: [
         { key: "nombre", label: "Proyecto", strong: true },
@@ -782,7 +713,7 @@ const admProyectos = {
     ],
     fields: [
         { key: "nombre", label: "Nombre del proyecto" },
-        { key: "semillero", label: "Semillero" },
+        { key: "semillero", label: "Semillero", type: "select", options: semilleroNames },
         { key: "estado", label: "Estado", type: "select", options: ["Nuevo", "En curso", "Finalizado", "Suspendido"] },
         { key: "descripcion", label: "Descripción", type: "textarea", required: false }
     ]
@@ -796,7 +727,6 @@ const admEventos = {
     title: "Eventos", subtitle: "Administra los eventos académicos y científicos.",
     endpoint: "/admin/eventos", create: "Nuevo evento",
     filterKey: "estado", filterOptions: ["Abierta", "Cerrada"],
-    mock: function () { return TEMP_DATA.eventos; },
     defaults: { estado: "Abierta" },
     columns: [
         { key: "nombre", label: "Evento", strong: true },
@@ -809,7 +739,7 @@ const admEventos = {
         { key: "nombre", label: "Nombre del evento" },
         { key: "fecha", label: "Fecha", type: "date" },
         { key: "modalidad", label: "Modalidad", type: "select", options: MODALIDADES },
-        { key: "semillero", label: "Semillero organizador" },
+        { key: "semillero", label: "Semillero organizador", type: "select", options: function () { return [""].concat(semilleroNames()); }, required: false },
         { key: "estado", label: "Estado", type: "select", options: ["Abierta", "Cerrada"] }
     ]
 };
@@ -820,7 +750,6 @@ const admConvocatorias = {
     title: "Convocatorias", subtitle: "Publica y administra las convocatorias institucionales de investigación.",
     endpoint: "/admin/convocatorias", create: "Nueva convocatoria",
     filterKey: "estado", filterOptions: ["Abierta", "Cerrada"],
-    mock: function () { return TEMP_CONVOCATORIAS; },
     defaults: { estado: "Abierta", postulaciones: 0 },
     columns: [
         { key: "titulo", label: "Convocatoria", strong: true },
@@ -846,7 +775,6 @@ const admPublicaciones = {
     title: "Publicaciones", subtitle: "Modera las publicaciones registradas por los semilleros.",
     endpoint: "/admin/publicaciones",
     filterKey: "estado", filterOptions: ["Publicada", "En revisión", "Oculta"],
-    mock: function () { return TEMP_DATA.publicaciones; },
     columns: [
         { key: "titulo", label: "Título", strong: true },
         { key: "tipo", label: "Tipo" },
@@ -882,12 +810,109 @@ const admLogros = {
     title: "Logros", subtitle: "Valida los logros enviados por estudiantes y docentes.",
     endpoint: "/admin/logros",
     filterKey: "estado", filterOptions: ["Pendiente", "Aprobado", "Rechazado"],
-    mock: function () { return TEMP_DATA.logros; },
     columns: logroColumns
 };
 admLogros.actions = logroActions(admLogros);
 
-const ADMIN_MODULES = [admUsuarios, admSolicitudes, admSemilleros, admProyectos, admEventos, admConvocatorias, admPublicaciones, admLogros];
+const admProductos = {
+    id: "adm-productos", singular: "producto", titleKey: "titulo",
+    title: "Productos", subtitle: "Valida los productos registrados por los semilleros (artículos, patentes, ponencias).",
+    endpoint: "/admin/productos",
+    filterKey: "estado", filterOptions: ["Pendiente", "Aprobado", "Rechazado"],
+    columns: [
+        { key: "titulo", label: "Producto", strong: true },
+        { key: "tipo", label: "Tipo" },
+        { key: "semillero", label: "Semillero" },
+        { key: "fecha", label: "Fecha" },
+        { key: "estado", label: "Estado", badge: true }
+    ]
+};
+admProductos.actions = [
+    act.set(admProductos, "Aprobar", { estado: "Aprobado" }, "Producto aprobado", { tone: "success", show: function (row) { return row.estado === "Pendiente"; } }),
+    act.set(admProductos, "Rechazar", { estado: "Rechazado" }, "Producto rechazado", { tone: "danger", show: function (row) { return row.estado === "Pendiente"; } })
+];
+
+const admFacultades = {
+    id: "adm-facultades", singular: "facultad", titleKey: "nombre",
+    title: "Facultades", subtitle: "Administra las facultades académicas de la universidad.",
+    endpoint: "/admin/facultades", create: "Nueva facultad",
+    filterKey: "estado", filterOptions: ["Activo", "Inactivo"],
+    afterChange: function () { if (typeof loadCatalog === "function") loadCatalog(); },
+    columns: [
+        { key: "nombre", label: "Facultad", strong: true },
+        { key: "programas", label: "Programas" },
+        { key: "estado", label: "Estado", badge: true }
+    ],
+    fields: [{ key: "nombre", label: "Nombre de la facultad" }]
+};
+admFacultades.actions = [
+    act.edit(admFacultades),
+    act.set(admFacultades, "Desactivar", { estado: "Inactivo" }, "Facultad desactivada", { tone: "danger", show: function (row) { return row.estado === "Activo"; } }),
+    act.set(admFacultades, "Activar", { estado: "Activo" }, "Facultad activada", { tone: "success", show: function (row) { return row.estado !== "Activo"; } })
+];
+
+const admProgramas = {
+    id: "adm-programas", singular: "programa", titleKey: "nombre",
+    title: "Programas académicos", subtitle: "Administra los programas asociados a cada facultad.",
+    endpoint: "/admin/programas", create: "Nuevo programa",
+    filterKey: "estado", filterOptions: ["Activo", "Inactivo"],
+    afterChange: function () { if (typeof loadCatalog === "function") loadCatalog(); },
+    columns: [
+        { key: "nombre", label: "Programa", strong: true },
+        { key: "facultad", label: "Facultad" },
+        { key: "estado", label: "Estado", badge: true }
+    ],
+    fields: [
+        { key: "nombre", label: "Nombre del programa" },
+        { key: "facultad", label: "Facultad", type: "select", options: function () { return FACULTADES.slice(); } }
+    ]
+};
+admProgramas.actions = [
+    act.edit(admProgramas),
+    act.set(admProgramas, "Desactivar", { estado: "Inactivo" }, "Programa desactivado", { tone: "danger", show: function (row) { return row.estado === "Activo"; } }),
+    act.set(admProgramas, "Activar", { estado: "Activo" }, "Programa activado", { tone: "success", show: function (row) { return row.estado !== "Activo"; } })
+];
+
+const admBitacora = {
+    id: "adm-bitacora", singular: "registro", titleKey: "accion",
+    title: "Bitácora", subtitle: "Acciones críticas del sistema: validaciones, cambios de rol, XP y accesos (últimos 300 registros).",
+    endpoint: "/admin/bitacora",
+    columns: [
+        { key: "fecha", label: "Fecha" },
+        { key: "usuario", label: "Usuario", strong: true },
+        { key: "accion", label: "Acción" },
+        { key: "detalle", label: "Detalle" }
+    ]
+};
+
+const notificaciones = {
+    id: "notificaciones", singular: "notificación", titleKey: "mensaje",
+    title: "Notificaciones", subtitle: "Historial de avisos sobre tu cuenta, logros, publicaciones y convocatorias.",
+    endpoint: "/me/notificaciones", quietLoad: true,
+    filterKey: "estado", filterOptions: ["Nueva", "Leída"],
+    columns: [
+        { key: "fecha", label: "Fecha" },
+        { key: "mensaje", label: "Mensaje", strong: true },
+        { key: "estado", label: "Estado", badge: true }
+    ]
+};
+notificaciones.actions = [{
+    label: "Marcar como leída",
+    show: function (row) { return !row.leida; },
+    run: async function (row) {
+        const result = await persist("PATCH", `/notificaciones/${row.id}`, {});
+        if (!result.ok) return;
+        row.leida = true;
+        row.estado = "Leída";
+        renderModule(notificaciones);
+        updateNotificationBadge();
+    }
+}];
+
+const ADMIN_MODULES = [
+    admUsuarios, admSolicitudes, admSemilleros, admProyectos, admEventos, admConvocatorias,
+    admPublicaciones, admLogros, admProductos, admFacultades, admProgramas, admBitacora
+];
 
 
 /* ============================================================
@@ -899,7 +924,6 @@ const docIntegrantes = {
     title: "Integrantes", subtitle: "Aprueba solicitudes de vinculación y administra a los estudiantes de tu semillero.",
     endpoint: "/docente/integrantes", create: "Agregar integrante",
     filterKey: "estado", filterOptions: ["Activo", "Pendiente"],
-    mock: function () { return TEMP_DATA.docIntegrantes; },
     defaults: { estado: "Activo", desde: new Date().toISOString().slice(0, 10) },
     columns: [
         { key: "nombre", label: "Nombre", strong: true },
@@ -935,7 +959,6 @@ const docProyectos = {
     title: "Proyectos", subtitle: "Registra proyectos, publica avances y cierra su ciclo de vida.",
     endpoint: "/docente/proyectos", create: "Nuevo proyecto",
     filterKey: "estado", filterOptions: ["Nuevo", "En curso", "Finalizado", "Suspendido"],
-    mock: function () { return TEMP_DATA.proyectos.filter(function (p) { return p.semillero === "DataLab"; }); },
     defaults: { estado: "Nuevo", avance: 0, semillero: "DataLab", inicio: new Date().toISOString().slice(0, 10) },
     columns: [
         { key: "nombre", label: "Proyecto", strong: true },
@@ -985,7 +1008,6 @@ const docPublicaciones = {
     title: "Publicaciones", subtitle: "Crea y administra las publicaciones de tu semillero.",
     endpoint: "/docente/publicaciones", create: "Nueva publicación",
     filterKey: "estado", filterOptions: ["Publicada", "En revisión"],
-    mock: function () { return TEMP_DATA.publicaciones; },
     defaults: { estado: "En revisión", semillero: "DataLab", reacciones: 0, comentarios: 0, anio: new Date().getFullYear(), autor: getStoredUser().name || "Docente" },
     columns: [
         { key: "titulo", label: "Título", strong: true },
@@ -998,7 +1020,8 @@ const docPublicaciones = {
     fields: [
         { key: "titulo", label: "Título" },
         { key: "tipo", label: "Tipo", type: "select", options: ["Artículo", "Ponencia", "Producto", "Patente"] },
-        { key: "evidencia", label: "Enlace de evidencia", type: "url", required: false }
+        { key: "evidencia", label: "Enlace de evidencia", type: "url", required: false },
+        { key: "archivo", label: "Archivo de evidencia (PDF, imagen u Office · máx. 5 MB)", type: "file", required: false }
     ]
 };
 docPublicaciones.actions = [
@@ -1012,7 +1035,6 @@ const docEventos = {
     title: "Eventos", subtitle: "Registra la participación de tu semillero en eventos académicos.",
     endpoint: "/docente/eventos", create: "Registrar evento",
     filterKey: "estado", filterOptions: ["Abierta", "Cerrada"],
-    mock: function () { return TEMP_DATA.eventos.filter(function (e) { return e.semillero === "DataLab" || e.semillero === "BioLibre"; }).map(function (e) { return Object.assign({}, e, { semillero: "DataLab" }); }); },
     defaults: { estado: "Abierta", semillero: "DataLab" },
     columns: admEventos.columns.filter(function (c) { return c.key !== "semillero"; }),
     fields: admEventos.fields.filter(function (f) { return f.key !== "semillero" && f.key !== "estado"; })
@@ -1024,13 +1046,13 @@ const docLogros = {
     title: "Logros", subtitle: "Valida los logros de tus integrantes y registra los de tu semillero.",
     endpoint: "/docente/logros", create: "Registrar logro",
     filterKey: "estado", filterOptions: ["Pendiente", "Aprobado", "Rechazado"],
-    mock: function () { return TEMP_DATA.logros; },
     defaults: { estado: "Pendiente", xp: 100, usuario: getStoredUser().name || "Docente" },
     columns: logroColumns,
     fields: [
         { key: "descripcion", label: "Descripción del logro" },
         { key: "tipo", label: "Tipo de logro", type: "select", options: ["Artículo", "Ponencia", "Producto", "Patente", "Evento"] },
-        { key: "evidencia", label: "Enlace de evidencia", type: "url", required: false }
+        { key: "evidencia", label: "Enlace de evidencia (o adjunta un archivo)", type: "url", required: false },
+        { key: "archivo", label: "Archivo de evidencia (PDF, imagen u Office · máx. 5 MB)", type: "file", required: false }
     ]
 };
 docLogros.actions = logroActions(docLogros);
@@ -1040,7 +1062,6 @@ const docConvocatorias = {
     title: "Convocatorias", subtitle: "Consulta las convocatorias institucionales y postula a tu semillero.",
     endpoint: "/convocatorias",
     filterKey: "estado", filterOptions: ["Abierta", "Cerrada"],
-    mock: function () { return TEMP_CONVOCATORIAS; },
     columns: [
         { key: "titulo", label: "Convocatoria", strong: true },
         { key: "cierre", label: "Cierre" },
@@ -1069,7 +1090,28 @@ docConvocatorias.actions = [{
     }
 }];
 
-const DOCENTE_MODULES = [docIntegrantes, docProyectos, docPublicaciones, docEventos, docLogros, docConvocatorias];
+const docProductos = {
+    id: "doc-productos", singular: "producto", titleKey: "titulo",
+    title: "Productos del semillero", subtitle: "Registra artículos, patentes y ponencias del semillero y solicita su validación.",
+    endpoint: "/docente/productos", create: "Registrar producto",
+    filterKey: "estado", filterOptions: ["Pendiente", "Aprobado", "Rechazado"],
+    columns: [
+        { key: "titulo", label: "Producto", strong: true },
+        { key: "tipo", label: "Tipo" },
+        { key: "fecha", label: "Fecha" },
+        { key: "estado", label: "Estado", badge: true }
+    ],
+    fields: [
+        { key: "titulo", label: "Título del producto" },
+        { key: "tipo", label: "Tipo", type: "select", options: ["Artículo", "Patente", "Ponencia", "Software", "Otro"] },
+        { key: "descripcion", label: "Descripción", type: "textarea", required: false }
+    ]
+};
+docProductos.actions = [
+    Object.assign(act.remove(docProductos), { show: function (row) { return row.estado === "Pendiente"; } })
+];
+
+const DOCENTE_MODULES = [docIntegrantes, docProyectos, docPublicaciones, docEventos, docLogros, docProductos, docConvocatorias];
 
 
 /* ============================================================
@@ -1221,7 +1263,47 @@ function refreshDashboards() {
  * MI SEMILLERO (DOCENTE)
  * ============================================================ */
 
+/* RF-15: sin semillero a cargo se muestra el aviso y la opción de crearlo. */
+function toggleDocEmpty(show) {
+
+    document.querySelectorAll("[data-doc-empty]").forEach(function (box) {
+        box.classList.toggle("hidden", !show);
+    });
+
+    const edit = byId("doc-edit-semillero");
+    if (edit) edit.classList.toggle("hidden", show);
+}
+
 function bindDocSemillero() {
+
+    document.querySelectorAll("[data-doc-create]").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            openForm({
+                title: "Crear mi semillero",
+                submitLabel: "Crear semillero",
+                fields: [
+                    { key: "nombre", label: "Nombre del semillero" },
+                    { key: "descripcion", label: "Descripción", type: "textarea" },
+                    { key: "linea", label: "Línea de investigación" },
+                    { key: "facultad", label: "Facultad", type: "select", options: function () { return FACULTADES.slice(); } }
+                ],
+                onSubmit: async function (data) {
+
+                    const result = await persist("POST", "/docente/semillero", data);
+
+                    if (!result.ok) return false;
+
+                    RS["doc-semillero"] = result.data;
+                    toggleDocEmpty(false);
+                    DOCENTE_MODULES.forEach(loadModule);
+                    refreshDashboards();
+                    doneMessage("Semillero creado", result);
+                }
+            });
+        });
+    });
 
     byId("doc-edit-semillero").addEventListener("click", function () {
 
@@ -1251,21 +1333,22 @@ function bindDocSemillero() {
 
 async function loadDocSemillero() {
 
-    RS["doc-semillero"] = clone(TEMP_DATA.docSemillero);
-    refreshDashboards();
-
     try {
 
         const response = await api.get("/docente/semillero");
-        const data = response.data && (response.data.data || response.data);
-
-        if (data && data.nombre) {
-            RS["doc-semillero"] = Object.assign(RS["doc-semillero"], data);
-            refreshDashboards();
-        }
+        RS["doc-semillero"] = response.data.data;
+        toggleDocEmpty(false);
+        refreshDashboards();
 
     } catch (error) {
-        /* API aún no disponible: se conservan los datos temporales. */
+
+        /* 404: el docente aún no lidera ningún semillero (puede crearlo, RF-15) */
+        if (error.response && error.response.status === 404) {
+            toggleDocEmpty(true);
+            return;
+        }
+
+        showMessage(errorText(error), "error");
     }
 }
 
@@ -1285,6 +1368,12 @@ const NAV_ITEMS = {
         ["adm-convocatorias", "Convocatorias"],
         ["adm-publicaciones", "Publicaciones"],
         ["adm-logros", "Logros"],
+        ["adm-productos", "Productos"],
+        ["adm-facultades", "Facultades"],
+        ["adm-programas", "Programas"],
+        ["adm-reportes", "Reportes"],
+        ["adm-bitacora", "Bitácora"],
+        ["notificaciones", "Notificaciones"],
         ["profile", "Perfil"]
     ],
     docente: [
@@ -1295,7 +1384,9 @@ const NAV_ITEMS = {
         ["doc-publicaciones", "Publicaciones"],
         ["doc-eventos", "Eventos"],
         ["doc-logros", "Logros"],
+        ["doc-productos", "Productos"],
         ["doc-convocatorias", "Convocatorias"],
+        ["notificaciones", "Notificaciones"],
         ["profile", "Perfil"]
     ]
 };
@@ -1317,7 +1408,14 @@ Object.assign(screenTitles, {
     "doc-publicaciones": "Publicaciones",
     "doc-eventos": "Eventos",
     "doc-logros": "Logros",
-    "doc-convocatorias": "Convocatorias"
+    "doc-convocatorias": "Convocatorias",
+    "adm-productos": "Productos",
+    "adm-facultades": "Facultades",
+    "adm-programas": "Programas académicos",
+    "adm-reportes": "Reportes e indicadores",
+    "adm-bitacora": "Bitácora",
+    "doc-productos": "Productos del semillero",
+    "notificaciones": "Notificaciones"
 });
 
 const roleReady = {};
@@ -1330,11 +1428,13 @@ function buildRoleUI(role) {
     const modules = role === "admin" ? ADMIN_MODULES : DOCENTE_MODULES;
     const nav = byId(role === "admin" ? "nav-admin" : "nav-docente");
 
-    nav.innerHTML = NAV_ITEMS[role].map(function (item, index) {
+    nav.innerHTML = NAV_ITEMS[role].map(function (item) {
 
         const counter = item[0] === "adm-solicitudes"
             ? ` <span id="adm-pending-count" class="ml-1 hidden rounded-full bg-[#c9a227] px-2 py-0.5 text-xs text-white">0</span>`
-            : "";
+            : item[0] === "notificaciones"
+                ? ` <span data-notif-badge class="ml-1 hidden rounded-full bg-[#c9a227] px-2 py-0.5 text-xs text-white">0</span>`
+                : "";
 
         return `<button data-screen="${item[0]}" class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">${esc(item[1])}${counter}</button>`;
 
@@ -1349,23 +1449,16 @@ function buildRoleUI(role) {
     modules.forEach(bindModule);
 
     if (role === "docente") bindDocSemillero();
+    if (role === "admin") bindReports();
 
     if (role === "admin") {
 
         /* Usuarios y solicitudes comparten la misma lista en memoria. */
-        RS["adm-usuarios"] = clone(TEMP_DATA.usuarios);
-        RS["adm-solicitudes"] = RS["adm-usuarios"];
-        usingMock["adm-usuarios"] = usingMock["adm-solicitudes"] = true;
+        loadUsers();
 
         ADMIN_MODULES.forEach(function (cfg) {
-            if (cfg === admUsuarios || cfg === admSolicitudes) {
-                renderModule(cfg);
-            } else {
-                loadModule(cfg);
-            }
+            if (cfg !== admUsuarios && cfg !== admSolicitudes) loadModule(cfg);
         });
-
-        loadUsers();
 
     } else {
 
@@ -1376,21 +1469,19 @@ function buildRoleUI(role) {
 
 async function loadUsers() {
 
+    RS["adm-usuarios"] = RS["adm-solicitudes"] = [];
+
     try {
 
         const response = await api.get("/admin/users");
-        const data = response.data && (response.data.data || response.data);
-
-        if (Array.isArray(data)) {
-            RS["adm-usuarios"] = RS["adm-solicitudes"] = data;
-            usingMock["adm-usuarios"] = usingMock["adm-solicitudes"] = false;
-            renderModule(admUsuarios);
-            renderModule(admSolicitudes);
-        }
+        RS["adm-usuarios"] = RS["adm-solicitudes"] = response.data.data;
 
     } catch (error) {
-        /* API aún no disponible: se conservan los datos temporales. */
+        showMessage(`Usuarios: ${errorText(error)}`, "error");
     }
+
+    renderModule(admUsuarios);
+    renderModule(admSolicitudes);
 }
 
 function applyRole() {
@@ -1416,6 +1507,193 @@ function applyRole() {
     if (role === "admin" || role === "docente") {
         buildRoleUI(role);
     }
+
+    buildNotifications();
+
+    /* Los visitantes sin sesión no tienen notificaciones */
+    const guestOnly = !localStorage.getItem("access_token");
+    document.querySelectorAll('[data-screen="notificaciones"]').forEach(function (button) {
+        button.classList.toggle("hidden", guestOnly);
+    });
 }
+
+/* ============================================================
+ * NOTIFICACIONES (todos los roles con sesión)
+ * ============================================================ */
+
+let notificationsReady = false;
+
+function updateNotificationBadge() {
+
+    const unread = (RS.notificaciones || []).filter(function (n) { return !n.leida; }).length;
+
+    document.querySelectorAll("[data-notif-badge]").forEach(function (badgeEl) {
+        badgeEl.textContent = unread;
+        badgeEl.classList.toggle("hidden", unread === 0);
+    });
+}
+
+async function loadNotifications() {
+    await loadModule(notificaciones);
+    updateNotificationBadge();
+}
+
+function buildNotifications() {
+
+    if (notificationsReady || !localStorage.getItem("access_token")) return;
+    notificationsReady = true;
+
+    byId("role-screens").insertAdjacentHTML("beforeend", moduleScreenHtml(notificaciones));
+    bindModule(notificaciones);
+
+    byId("notificaciones-search").insertAdjacentHTML(
+        "afterend",
+        `<button id="notificaciones-read-all" type="button" class="rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">Marcar todas como leídas</button>`
+    );
+
+    byId("notificaciones-read-all").addEventListener("click", async function () {
+
+        const result = await persist("POST", "/notificaciones/leer-todas", {});
+
+        if (!result.ok) return;
+
+        (RS.notificaciones || []).forEach(function (n) { n.leida = true; n.estado = "Leída"; });
+        renderModule(notificaciones);
+        updateNotificationBadge();
+    });
+
+    loadNotifications();
+}
+
+
+/* ============================================================
+ * REPORTES E INDICADORES (ADMINISTRADOR · RF-50, RF-51, RF-53)
+ * ============================================================ */
+
+let rankingPublished = true;
+
+function bindReports() {
+
+    byId("rep-generar").addEventListener("click", loadIndicators);
+
+    document.querySelectorAll("[data-report]").forEach(function (button) {
+        button.addEventListener("click", function () { downloadReport(button.dataset.report); });
+    });
+
+    byId("rep-ranking-toggle").addEventListener("click", async function () {
+
+        const result = await persist("PUT", "/admin/config/ranking", { publicado: !rankingPublished });
+
+        if (!result.ok) return;
+
+        rankingPublished = !!result.data.publicado;
+        renderRankingState();
+        doneMessage("Ranking actualizado", result);
+    });
+}
+
+function renderRankingState() {
+    byId("rep-ranking-state").textContent = rankingPublished
+        ? "El ranking institucional está publicado."
+        : "El ranking institucional está oculto para los usuarios.";
+    byId("rep-ranking-toggle").textContent = rankingPublished ? "Ocultar ranking" : "Publicar ranking";
+}
+
+async function loadIndicators() {
+
+    try {
+
+        const response = await api.get("/admin/indicadores", {
+            params: {
+                agrupar: byId("rep-agrupar").value,
+                desde: byId("rep-desde").value || undefined,
+                hasta: byId("rep-hasta").value || undefined
+            }
+        });
+
+        const data = response.data.data;
+        const total = data.resumen;
+
+        renderStats("rep-resumen", [
+            ["Semilleros activos", total.semilleros],
+            ["Investigadores", total.investigadores],
+            ["Proyectos", total.proyectos],
+            ["Publicaciones", total.publicaciones],
+            ["Logros aprobados", total.logros],
+            ["XP total", total.xp_total]
+        ]);
+
+        byId("rep-tabla").innerHTML = `
+            <div class="overflow-x-auto rounded-2xl bg-white shadow-sm">
+                <table class="w-full min-w-[640px] text-left text-sm">
+                    <thead class="bg-slate-50"><tr>
+                        ${["Grupo", "Semilleros", "Integrantes", "Proyectos", "Publicaciones", "Logros", "XP"].map(function (h) {
+                            return `<th class="px-4 py-3 font-semibold">${h}</th>`;
+                        }).join("")}
+                    </tr></thead>
+                    <tbody>${data.filas.map(function (row) {
+                        return `<tr class="border-b last:border-b-0">
+                            <td class="px-4 py-3 font-semibold">${esc(row.grupo)}</td>
+                            <td class="px-4 py-3">${row.semilleros}</td>
+                            <td class="px-4 py-3">${row.integrantes}</td>
+                            <td class="px-4 py-3">${row.proyectos}</td>
+                            <td class="px-4 py-3">${row.publicaciones}</td>
+                            <td class="px-4 py-3">${row.logros}</td>
+                            <td class="px-4 py-3">${row.xp}</td>
+                        </tr>`;
+                    }).join("")}</tbody>
+                </table>
+            </div>`;
+
+    } catch (error) {
+        showMessage(errorText(error), "error");
+    }
+}
+
+async function downloadReport(type) {
+
+    try {
+
+        const response = await api.get(`/admin/reportes/${type}`, { responseType: "blob" });
+        const url = URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `riul-${type}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+
+    } catch (error) {
+        showMessage("No se pudo generar el reporte", "error");
+    }
+}
+
+async function onRoleScreen(name) {
+
+    if (name === "notificaciones" && notificationsReady) loadNotifications();
+
+    if (name === "adm-reportes") {
+
+        loadIndicators();
+
+        try {
+            const response = await api.get("/admin/config/ranking");
+            rankingPublished = !!response.data.data.publicado;
+            renderRankingState();
+        } catch (error) {
+            showMessage(errorText(error), "error");
+        }
+    }
+}
+
+/* Cada cambio de pantalla puede refrescar datos de su módulo */
+const baseShowScreen = showScreen;
+
+showScreen = function (name) {
+    baseShowScreen(name);
+    onRoleScreen(name);
+};
 
 document.addEventListener("DOMContentLoaded", bindModal);

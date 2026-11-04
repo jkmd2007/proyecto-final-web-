@@ -1,35 +1,29 @@
-#imagen de base
-From python:3.12-slim
+# Imagen base
+FROM python:3.12-slim
 
-#variables de entorno
+# Variables de entorno de Python
 ENV PYTHONDONTWRITEBYTECODE=1
-#logs
+# Logs sin buffer
 ENV PYTHONUNBUFFERED=1
-#directorio de trabajo
+
+# Directorio de trabajo
 WORKDIR /app
 
-#dependencias del sistema
-
+# Dependencias del sistema
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc \ 
+    && apt-get install -y --no-install-recommends gcc \
     && rm -rf /var/lib/apt/lists/*
 
-#dependencias de pythond
-
+# Dependencias de Python
 COPY requirements.txt .
-
-#Instalamos las dependencias
-
 RUN pip install --no-cache-dir -r requirements.txt
 
-#codigo de la aplicacion
-
+# Codigo de la aplicacion
 COPY . .
 
-#puerto
-
+# Puerto
 EXPOSE 5000
 
-#Guinicorn exect app en flask
-
-CMD [ "gunicorn","--bind","0.0.0.0:5000","--workers","3","run:app" ]
+# Gunicorn ejecuta la app Flask. --preload crea las tablas y los datos
+# iniciales una sola vez antes de lanzar los workers.
+CMD ["gunicorn", "--preload", "--bind", "0.0.0.0:5000", "--workers", "3", "run:app"]

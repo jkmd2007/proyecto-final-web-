@@ -22,6 +22,16 @@
     </div>
 
     <div id="adm-stats" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"></div>
+    <div class="mt-6">
+        
+        <h3 class="mb-4 text-lg font-semibold text-[#232321]">
+            Indicadores institucionales
+        </h3>
+
+        <div id="adm-institutional-stats"
+             class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        </div>
+    </div>
 
     <div class="grid gap-6 xl:grid-cols-2">
 
@@ -64,6 +74,21 @@
             Coordina integrantes, proyectos, publicaciones y logros de
             <span data-doc="nombre" class="font-semibold">tu semillero</span>.
         </p>
+    </div>
+
+    <div data-doc-empty role="status" class="hidden rounded-2xl border border-[#c9a227] bg-[#fdf6dc] p-6">
+        <h3 class="text-lg font-semibold text-[#232321]">Aún no lideras un semillero</h3>
+        <p class="mt-1 text-sm text-[#6b6a66]">
+            Crea tu semillero indicando su descripción, línea de investigación y facultad.
+            Si ya existe uno a tu cargo, pídele al administrador que te lo asigne.
+        </p>
+        <button
+            type="button"
+            data-doc-create
+            class="mt-4 rounded-md bg-[#3a3a38] px-5 py-2 text-sm font-semibold text-white hover:bg-[#2c2c2a]"
+        >
+            Crear mi semillero
+        </button>
     </div>
 
     <div id="doc-stats" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"></div>
@@ -114,6 +139,21 @@
 
 <section id="doc-semillero-screen" class="app-screen hidden space-y-6">
 
+    <div data-doc-empty role="status" class="hidden rounded-2xl border border-[#c9a227] bg-[#fdf6dc] p-6">
+        <h3 class="text-lg font-semibold text-[#232321]">Aún no lideras un semillero</h3>
+        <p class="mt-1 text-sm text-[#6b6a66]">
+            Crea tu semillero indicando su descripción, línea de investigación y facultad.
+            Si ya existe uno a tu cargo, pídele al administrador que te lo asigne.
+        </p>
+        <button
+            type="button"
+            data-doc-create
+            class="mt-4 rounded-md bg-[#3a3a38] px-5 py-2 text-sm font-semibold text-white hover:bg-[#2c2c2a]"
+        >
+            Crear mi semillero
+        </button>
+    </div>
+
     <article class="rounded-2xl border border-[#d8d7d1] bg-white p-6 shadow-sm">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
@@ -158,6 +198,64 @@
 </section>
 
 
+<!-- ======================= ADMIN · REPORTES ======================= -->
+
+<section id="adm-reportes-screen" class="app-screen hidden space-y-6">
+
+    <div class="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 class="text-2xl font-bold">Reportes e indicadores</h2>
+        <p class="mt-2 text-sm text-[#6b6a66]">
+            Producción investigativa por facultad, programa o semillero, y reportes exportables.
+        </p>
+
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <label class="text-sm font-medium text-[#3a3a38]">Agrupar por
+                <select id="rep-agrupar" class="mt-1 w-full rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text-sm">
+                    <option value="facultad">Facultad</option>
+                    <option value="programa">Programa</option>
+                    <option value="semillero">Semillero</option>
+                </select>
+            </label>
+            <label class="text-sm font-medium text-[#3a3a38]">Desde
+                <input id="rep-desde" type="date" class="mt-1 w-full rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text-sm">
+            </label>
+            <label class="text-sm font-medium text-[#3a3a38]">Hasta
+                <input id="rep-hasta" type="date" class="mt-1 w-full rounded-lg border border-[#c9c8c2] bg-white px-3 py-2 text-sm">
+            </label>
+            <div class="flex items-end">
+                <button id="rep-generar" type="button" class="w-full rounded-md bg-[#3a3a38] px-5 py-2 text-sm font-medium text-white">
+                    Generar indicadores
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rep-resumen" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6"></div>
+    <div id="rep-tabla"></div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+        <article class="rounded-2xl border border-[#d8d7d1] bg-white p-6 shadow-sm">
+            <h3 class="text-lg font-semibold">Exportar reportes (CSV)</h3>
+            <div class="mt-4 flex flex-wrap gap-3">
+                <button type="button" data-report="publicaciones" class="rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">Publicaciones</button>
+                <button type="button" data-report="logros" class="rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">Logros</button>
+                <button type="button" data-report="proyectos" class="rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">Proyectos</button>
+                <button type="button" data-report="semilleros" class="rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">Semilleros</button>
+            </div>
+        </article>
+
+        <article class="rounded-2xl border border-[#d8d7d1] bg-white p-6 shadow-sm">
+            <h3 class="text-lg font-semibold">Ranking institucional</h3>
+            <p id="rep-ranking-state" class="mt-2 text-sm text-[#6b6a66]"></p>
+            <button id="rep-ranking-toggle" type="button" class="mt-4 rounded-md border border-[#c9c8c2] bg-[#eeeeea] px-4 py-2 text-sm font-medium text-[#3a3a38]">
+                Ocultar ranking
+            </button>
+        </article>
+    </div>
+
+</section>
+
+
 <!-- Pantallas de módulos generadas desde roles.js -->
 <div id="role-screens"></div>
 
@@ -176,7 +274,7 @@
         class="max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
     >
         <h3 id="role-modal-title" class="text-xl font-bold text-[#232321]"></h3>
-        <p id="role-modal-text" class="hidden text-sm text-[#6b6a66]"></p>
+        <p id="role-modal-text" class="hidden max-h-56 overflow-y-auto whitespace-pre-line text-sm text-[#6b6a66]"></p>
         <div id="role-modal-fields" class="space-y-3"></div>
         <div class="flex justify-end gap-3 pt-2">
             <button

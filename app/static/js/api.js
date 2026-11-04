@@ -82,9 +82,14 @@ api.interceptors.response.use(
 
     function (error) {
 
+        const isAuthRequest = String(
+            (error.config && error.config.url) || ""
+        ).startsWith("/auth/");
+
         if (
             error.response &&
-            error.response.status === 401
+            error.response.status === 401 &&
+            !isAuthRequest
         ) {
 
             localStorage.removeItem(

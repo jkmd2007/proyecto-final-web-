@@ -10,6 +10,12 @@
 
         <div class="flex items-center gap-3">
 
+            <img
+                src="{{ url_for('static', filename='style/img/Escudo-Unilibre.png') }}"
+                alt="Escudo de la Universidad Libre"
+                class="h-9 w-9 object-contain"
+            >
+
             <span
                 class="rounded-md bg-[#3a3a38] px-3 py-1 text-xs font-bold tracking-wide text-white"
             >
@@ -46,6 +52,8 @@
 
             <div
                 id="navbar-avatar"
+                role="img"
+                aria-label="Avatar del usuario"
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-[#c9a227] text-xs font-bold text-white"
             >
                 PR

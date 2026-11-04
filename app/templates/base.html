@@ -74,6 +74,8 @@
 
 <body class="min-h-screen bg-[#f1f0ec] text-[#232321]">
 
+    <a href="#app-main" class="skip-link">Saltar al contenido principal</a>
+
 
     <!-- =====================================================
          NAVBAR
@@ -106,7 +108,7 @@
          CONTENIDO PRINCIPAL
     ====================================================== -->
 
-    <main id="app-main" class="hidden mx-auto max-w-7xl px-6 py-8">
+    <main id="app-main" tabindex="-1" class="hidden mx-auto max-w-7xl px-6 py-8">
 
 
         <!-- =================================================
@@ -142,6 +144,12 @@
         src="{{ url_for(
             'static',
             filename='js/roles.js'
+        ) }}"
+    ></script>
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/student.js'
         ) }}"
     ></script>
 
